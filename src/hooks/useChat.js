@@ -5,7 +5,7 @@ const INITIAL_MESSAGES = [
   {
     id: '1',
     role: 'assistant',
-    text: 'こんにちは！AI Okānへようこそ。本日はどのようにお手伝いできますか？',
+    text: 'こんにちは！AI Okanへようこそ。本日はどのようにお手伝いできますか？',
     phase: 'welcome',
   },
 ];
