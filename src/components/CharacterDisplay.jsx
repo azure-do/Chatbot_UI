@@ -110,7 +110,7 @@ const CharacterDisplay = ({ expression, isThinking, isSpeaking, compact = false 
       {/* Label — only in standalone (non-compact) mode */}
       {!compact && (
         <p className="mt-6 text-sm font-medium text-slate-500 uppercase tracking-widest">
-          {isThinking ? 'AI Okan is thinking…' : `Status: ${expression}`}
+          {isThinking ? 'AI Okān is thinking…' : `Status: ${expression}`}
         </p>
       )}
     </div>

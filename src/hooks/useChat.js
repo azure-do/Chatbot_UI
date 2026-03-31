@@ -5,7 +5,7 @@ const INITIAL_MESSAGES = [
   {
     id: '1',
     role: 'assistant',
-    text: 'こんにちは！AI Okanへようこそ。本日はどのようにお手伝いできますか？',
+    text: 'こんにちは！AI Okānへようこそ。本日はどのようにお手伝いできますか？',
     phase: 'welcome',
   },
 ];
@@ -27,8 +27,8 @@ const getNextPhase = (current) => {
 };
 
 const splitChunks = (text) => {
-  const chunks = text.match(/\S+|\s+/g) || [];
-  return chunks.length > 1 ? chunks : text.split('');
+  // Split character by character for very slow streaming
+  return text.split('');
 };
 
 const generateChatGPTStyleResponse = (userText) => {
@@ -37,26 +37,51 @@ const generateChatGPTStyleResponse = (userText) => {
     return 'すみません、質問の内容がよくわかりませんでした。もう少し詳しく教えていただけますか？';
   }
 
-  const baseAnswer = [];
-  baseAnswer.push('お問い合わせありがとうございます。AI Okanです。');
+  const responses = [];
 
   if (/価格|値段|費用|料金/.test(normalized)) {
-    baseAnswer.push('商品の価格については、サイズや仕様によって変動します。具体的な候補があれば、さらに詳しくご案内いたします。');
+    responses.push('ご質問ありがとうございます。価格についてですね。');
+    responses.push('商品の価格はサイズや仕様によって異なります。');
+    responses.push('具体的にどのような商品をお探しですか？');
+    responses.push('詳しい情報をいただければ、最適なご提案ができます。');
   } else if (/在庫|いつ|納期|入荷/.test(normalized)) {
-    baseAnswer.push('在庫状況や納期は、タイミングによって変わります。ご希望の商品名や数量を教えていただければ、最新情報をお伝えできます。');
-  } else if (/使い方|方法|どう/.test(normalized)) {
-    baseAnswer.push('使い方については、まず基本的な手順をご説明します。具体的な目的に合わせて、より適切な利用方法をご紹介できます。');
-  } else if (/おすすめ|どれ|ベスト/.test(normalized)) {
-    baseAnswer.push('おすすめの選び方に関しては、用途やご予算に合わせて判断するのがポイントです。お好みのスタイルや用途を教えてください。');
-  } else if (/ありがとう|助か|感謝/.test(normalized)) {
-    baseAnswer.push('こちらこそありがとうございます。ほかにも気になる点があれば、どうぞ遠慮なくお知らせください。');
+    responses.push('在庫状況についてのご質問ですね。');
+    responses.push('現在の在庫状況は常に変動しています。');
+    responses.push('ご希望の商品名や数量を教えていただければ、');
+    responses.push('最新の在庫情報と納期をお伝えできます。');
+  } else if (/使い方|方法|どう|使用/.test(normalized)) {
+    responses.push('使い方についてのご質問ですね。');
+    responses.push('まず基本的な手順からご説明いたします。');
+    responses.push('具体的な用途や目的を教えていただくと、');
+    responses.push('より適切な利用方法をご紹介できます。');
+  } else if (/おすすめ|どれ|ベスト|選び方/.test(normalized)) {
+    responses.push('おすすめについてのご質問ですね。');
+    responses.push('選び方のポイントは、用途とご予算です。');
+    responses.push('どのような場面で使用されるのか、');
+    responses.push('また予算の目安を教えていただけますか？');
+  } else if (/ありがとう|助か|感謝|ありがとうございます/.test(normalized)) {
+    responses.push('こちらこそ、ご利用ありがとうございます。');
+    responses.push('ご不明な点やご質問があれば、');
+    responses.push('いつでもお気軽にお聞きください。');
+    responses.push('本日はご利用いただきありがとうございました。');
+  } else if (/返品|交換|キャンセル/.test(normalized)) {
+    responses.push('返品・交換についてのご質問ですね。');
+    responses.push('当店では、ご購入後30日以内の返品に対応しています。');
+    responses.push('詳しい条件や手続きについては、');
+    responses.push('お気軽にお問い合わせください。');
+  } else if (/営業時間|営業|時間/.test(normalized)) {
+    responses.push('営業時間についてのご質問ですね。');
+    responses.push('当店の営業時間は、平日10:00～19:00です。');
+    responses.push('土日祝日も営業しており、');
+    responses.push('ご不明な点はいつでもお気軽にお聞きください。');
   } else {
-    baseAnswer.push(`「${normalized}」について、できるだけ丁寧にお答えします。`);
-    baseAnswer.push('必要であれば、さらに詳しい情報や次のステップも追加でご案内いたします。');
+    responses.push(`「${normalized}」についてですね。`);
+    responses.push('ご質問の内容をしっかり理解させていただきました。');
+    responses.push('詳しくご説明させていただきます。');
+    responses.push('ご不明な点があれば、いつでもお気軽にお聞きください。');
   }
 
-  baseAnswer.push('ご不明点があれば、いつでもお気軽にお聞きください。');
-  return baseAnswer.join(' ');
+  return responses.join(' ');
 };
 
 export const useChat = () => {
@@ -70,21 +95,26 @@ export const useChat = () => {
   const streamMessage = useCallback((messageId, fullText, onComplete) => {
     let currentIndex = 0;
     const chunks = splitChunks(fullText);
+    
+    // Simulate thinking time before streaming starts
+    const thinkingDelay = setTimeout(() => {
+      const streamInterval = setInterval(() => {
+        if (currentIndex < chunks.length) {
+          const textToShow = chunks.slice(0, currentIndex + 1).join('');
+          setStreamingText(textToShow);
+          currentIndex++;
+        } else {
+          clearInterval(streamInterval);
+          setStreamingMessageId(null);
+          setStreamingText('');
+          if (onComplete) onComplete();
+        }
+      }, 60); // Slower - 60ms per character
 
-    const streamInterval = setInterval(() => {
-      if (currentIndex < chunks.length) {
-        const textToShow = chunks.slice(0, currentIndex + 1).join('');
-        setStreamingText(textToShow);
-        currentIndex++;
-      } else {
-        clearInterval(streamInterval);
-        setStreamingMessageId(null);
-        setStreamingText('');
-        if (onComplete) onComplete();
-      }
-    }, 60);
+      return () => clearInterval(streamInterval);
+    }, 2500); // 2.5 second thinking delay before streaming starts
 
-    return () => clearInterval(streamInterval);
+    return () => clearTimeout(thinkingDelay);
   }, []);
 
   const handleSendMessage = (text) => {

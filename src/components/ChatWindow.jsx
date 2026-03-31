@@ -74,6 +74,15 @@ const ChatWindow = ({ messages, onSendMessage, isThinking, expression, isSpeakin
     return msg.text;
   };
 
+  // Animated dots component
+  const AnimatedDots = () => (
+    <span className="inline-flex gap-1">
+      <span className="inline-block w-1 h-1 bg-[#a56a45] rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+      <span className="inline-block w-1 h-1 bg-[#a56a45] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+      <span className="inline-block w-1 h-1 bg-[#a56a45] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+    </span>
+  );
+
   return (
     <div className="flex flex-col h-full min-h-0 bg-[#fff7ef]">
 
@@ -115,7 +124,9 @@ const ChatWindow = ({ messages, onSendMessage, isThinking, expression, isSpeakin
                 >
                   {getDisplayText(msg)}
                   {msg.id === streamingMessageId && streamingText && (
-                    <span className="inline-block w-0.5 h-4 bg-[#a56a45] ml-0.5 animate-pulse" />
+                    <>
+                      <AnimatedDots />
+                    </>
                   )}
                 </div>
 
@@ -135,16 +146,12 @@ const ChatWindow = ({ messages, onSendMessage, isThinking, expression, isSpeakin
               className="flex items-end gap-2"
             >
               <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#f4e3d2] flex items-center justify-center shadow-sm">
-                <Bot size={14} className="text-[#9b6a43] animate-pulse" />
+                <Bot size={14} className="text-[#9b6a43]" />
               </div>
-              <div className="bg-[#fbf0e6] px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex gap-1.5 items-center">
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className="w-1.5 h-1.5 bg-[#d9b09b] rounded-full animate-bounce"
-                    style={{ animationDelay: `${i * 0.15}s` }}
-                  />
-                ))}
+              <div className="bg-[#f5ece3] border border-[#ecdcd0] px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex gap-1.5 items-center">
+                <span className="w-2 h-2 bg-[#9b6a43] rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+                <span className="w-2 h-2 bg-[#9b6a43] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                <span className="w-2 h-2 bg-[#9b6a43] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
               </div>
             </motion.div>
           )}
